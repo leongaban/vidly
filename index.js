@@ -2,11 +2,19 @@ const express = require('express');
 const Joi = require('joi'); // https://www.npmjs.com/package/joi
 const app = express();
 
-// Adding and using JSON middleware.
+// Adding JSON middleware.
 app.use(express.json());
 
+// Consts
+const imgPath = 'https://via.placeholder.com/50x50';
+const genreIdNotFound = 'The genre with the given ID was not found.';
+
 // Genres array.
-const genres = [];
+const genres = [
+  { id: 1, name: 'action', image: imgPath },
+  { id: 2, name: 'adventure', image: imgPath },
+  { id: 3, name: 'comedy', image: imgPath }
+];
 
 app.get('/', (req, res) => {
   res.send('Welcome to Vidly');
@@ -20,7 +28,7 @@ app.get('/api/genres', (req, res) => {
 });
 
 /*
- * { POST } all genres
+ * { POST } add a genre to genres
  */
 app.post('/api/genres', (req, res) => {
   const { error } = validateGenre(req.body);
@@ -32,6 +40,33 @@ app.post('/api/genres', (req, res) => {
   };
 
   genres.push(genre);
+  res.send(genre);
+});
+
+/*
+ * { PUT } update a genre
+ */
+app.put('/api/genres/:id', (req, res) => {
+  const genre = genres.find(g => g.id === parseInt(req.params.id));
+  if (!genre) return res.status(404).send(genreIdNotFound);
+
+  const { error } = validateGenre(req.body);
+  if (error) return res.status(400).send(error.details[0].message);
+
+  // Update genre
+  genre.name = req.body.name;
+  genre.image = req.body.image;
+
+  res.send(genre);
+});
+
+app.delete('/api/genres/:id', (req, res) => {
+  const genre = genres.find(c => c.id === parseInt(req.params.id));
+  if (!genre) return res.status(404).send(genreIdNotFound);
+
+  const index = genres.indexOf(genre);
+  genres.splice(index, 1);
+
   res.send(genre);
 });
 
