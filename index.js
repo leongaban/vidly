@@ -5,15 +5,21 @@ const Joi = require('joi'); // https://www.npmjs.com/package/joi
 const logger = require('./logger');
 const app = express();
 
+// console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
+// console.log(`app: ${app.get('env')}`); // returns development if NODE_ENV is not set.
 
 // Middlewares
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(express.static('public'));
 app.use(helment());
-app.use(morgan('tiny'));
 
-app.use(logger);
+if (app.get('env') === 'development') {
+  app.use(morgan('tiny')); // Set only on DEV
+  app.use(logger);
+  console.log('[DEV] Morgan enabled...');
+}
+
 
 // Consts
 const imgPath = 'https://via.placeholder.com/50x50';
