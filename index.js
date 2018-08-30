@@ -1,12 +1,20 @@
-const express = require('express');
+const debug = require('debug')('app:startup'); // https://www.npmjs.com/package/debug
+// export DEBUG=app:startup
+const config = require('config'); // https://www.npmjs.com/package/config
+const express = require('express'); // https://expressjs.com/en/4x/api.html
 const helment = require('helmet'); // https://github.com/helmetjs/helmet
 const morgan = require('morgan'); // https://expressjs.com/en/resources/middleware/morgan.html
 const Joi = require('joi'); // https://www.npmjs.com/package/joi
-const logger = require('./logger');
+const reqLogger = require('./reqLogger');
 const app = express();
 
 // console.log(`NODE_ENV: ${process.env.NODE_ENV}`);
 // console.log(`app: ${app.get('env')}`); // returns development if NODE_ENV is not set.
+
+// Configuation
+console.log('Application Name: ' + config.get('name'));
+console.log('Mail Servier: ' + config.get('mail.host'));
+console.log('Mail Password: ' + config.get('mail.password'));
 
 // Middlewares
 app.use(express.json());
@@ -15,11 +23,10 @@ app.use(express.static('public'));
 app.use(helment());
 
 if (app.get('env') === 'development') {
-  app.use(morgan('tiny')); // Set only on DEV
-  app.use(logger);
-  console.log('[DEV] Morgan enabled...');
+  debug('Morgan enabled...');
+  app.use(morgan('tiny')); // HTTP request logger middleware
+  app.use(reqLogger); // Log Request Bodies
 }
-
 
 // Consts
 const imgPath = 'https://via.placeholder.com/50x50';
