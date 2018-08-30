@@ -1,9 +1,19 @@
 const express = require('express');
+const helment = require('helmet'); // https://github.com/helmetjs/helmet
+const morgan = require('morgan'); // https://expressjs.com/en/resources/middleware/morgan.html
 const Joi = require('joi'); // https://www.npmjs.com/package/joi
+const logger = require('./logger');
 const app = express();
 
-// Adding JSON middleware.
+
+// Middlewares
 app.use(express.json());
+app.use(express.urlencoded({ extended: true }));
+app.use(express.static('public'));
+app.use(helment());
+app.use(morgan('tiny'));
+
+app.use(logger);
 
 // Consts
 const imgPath = 'https://via.placeholder.com/50x50';
@@ -36,7 +46,8 @@ app.post('/api/genres', (req, res) => {
 
   const genre = {
     id: genres.length + 1,
-    name: req.body.name
+    name: req.body.name,
+    image: req.body.image
   };
 
   genres.push(genre);
@@ -60,6 +71,9 @@ app.put('/api/genres/:id', (req, res) => {
   res.send(genre);
 });
 
+/*
+ * { DELETE } delete a genre
+ */
 app.delete('/api/genres/:id', (req, res) => {
   const genre = genres.find(c => c.id === parseInt(req.params.id));
   if (!genre) return res.status(404).send(genreIdNotFound);

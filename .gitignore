@@ -1,0 +1,13 @@
+# Folders
+.npm
+bower_components/
+moonholdings/
+node_modules/
+coverage/
+
+# Files
+.DS_Store
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+coverage.sh
