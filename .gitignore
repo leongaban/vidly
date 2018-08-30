@@ -2,7 +2,7 @@
 .npm
 bower_components/
 moonholdings/
-node_modules/
+
 coverage/
 
 # Files
